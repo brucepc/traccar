@@ -9,6 +9,9 @@
     <entry key='web.enable'>true</entry>
     <entry key='web.port'>8082</entry>
     <entry key='web.path'>/opt/traccar/web</entry>
+    
+    <entry key='web.type'>old</entry>
+    <entry key='web.application'>/opt/traccar/traccar-web.war</entry> 
 
     <entry key='geocoder.enable'>true</entry>
     <entry key='geocoder.type'>google</entry>
@@ -127,19 +130,34 @@
     <entry key='database.selectPositions'>
         SELECT * FROM positions WHERE deviceId = :deviceId AND fixTime BETWEEN :from AND :to ORDER BY fixTime;
     </entry>
-
+<!--
     <entry key='database.insertPosition'>
         INSERT INTO positions (deviceId, protocol, serverTime, deviceTime, fixTime, valid, latitude, longitude, altitude, speed, course, address, attributes)
         VALUES (:deviceId, :protocol, :now, :time, :time, :valid, :latitude, :longitude, :altitude, :speed, :course, :address, :attributes);
     </entry>
+-->
+    <entry key='database.insertPosition'>
+       INSERT INTO positions (deviceId, device_id, protocol, serverTime, deviceTime, time, fixTime, valid, latitude, longitude, altitude, speed, course, address, other, attributes)
+       VALUES (:deviceId ,:deviceId, :protocol, CURRENT_TIMESTAMP(), :time, :time, :time, :valid, :latitude, :longitude, :altitude, :speed, :course, :address, :attributes, :attributes);
+    </entry>
 
-    <entry key='database.selectLatestPositions'>
+<!--    <entry key='database.selectLatestPositions'>
         SELECT * FROM positions WHERE id IN (SELECT positionId FROM devices);
-    </entry>
+    </entry> -->
 
-    <entry key='database.updateLatestPosition'>
+<entry key='database.selectLatestPositions'>
+    SELECT id, protocol, device_id AS deviceId, serverTime, time AS deviceTime, time AS fixTime, 
+    valid, latitude, longitude, altitude, speed, course, address, other AS attributes 
+    FROM positions WHERE id IN (SELECT latestPosition_id FROM devices);
+</entry>
+
+  <!--  <entry key='database.updateLatestPosition'>
         UPDATE devices SET positionId = :id WHERE id = :deviceId;
-    </entry>
+    </entry>-->
+
+<entry key='database.updateLatestPosition'>
+    UPDATE devices SET latestPosition_id = :id WHERE id = :deviceId;
+</entry>
 
     <!-- PROTOCOL CONFIG -->
 
@@ -239,7 +257,7 @@
     <entry key='watch.port'>5093</entry>
     <entry key='t800x.port'>5094</entry>
     <entry key='upro.port'>5095</entry>
-    <entry key='auru.port'>5096</entry>
+    <entry key='auro.port'>5096</entry>
     <entry key='disha.port'>5097</entry>
     <entry key='thinkrace.port'>5098</entry>
     <entry key='pathaway.port'>5099</entry>
